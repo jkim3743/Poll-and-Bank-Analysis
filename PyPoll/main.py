@@ -1,82 +1,96 @@
-#import poll
-import os
-import csv
-#working directory
-csvpath=os.path.join('..','Resources','election_data.csv')
-with open(csvpath, newline='') as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',')
-    print(csvreader)
-    csv_header = next(csvreader)
-    
-    #Declaring variables
-    votes = []
-    county = []
-    candidates = []
-    khan = []
-    correy = []
-    li = []
-    otooley = []
+# Import dependencies
+import os, csv
+from pathlib import Path 
 
+# Assign file location with the pathlib library
+csv_file_path = Path("python-challenge", "PyPoll", "election_data.csv")
 
-    for row in csvreader:
-        votes.append(int(row[0]))
-        county.append(row[1])
-        candidates.append(row[2])
+# Declare Variables 
+total_votes = 0 
+khan_votes = 0
+correy_votes = 0
+li_votes = 0
+otooley_votes = 0
 
-    #VOTE COUNT
-    total_votes = (len(votes))
-    print(total_votes)
+# Open csv in default read mode with context manager
+with open(csv_file_path,newline="", encoding="utf-8") as elections:
 
-    #Votes by Person
-    for candidate in candidates:
-        if candidate == "Khan":
-            khan.append(candidates)
-            khan_votes = len(khan)
-        elif candidate == "Correy":
-            correy.append(candidates)
-            correy_votes = len(correy)
-        elif candidate == "Li":
-            li.append(candidates)
-            li_votes = len(li)
-        else:
-            otooley.append(candidates)
-            otooley_votes = len(otooley)
-    print(khan_votes)
-    print(correy_votes)
-    print(li_votes)
-    print(otooley_votes)
-    
-    
-    #Percentages
-    khan_percent = round(((khan_votes / total_votes) * 100), 2)
-    correy_percent = round(((correy_votes / total_votes) * 100), 2)
-    li_percent = round(((li_votes / total_votes) * 100), 2)
-    otooley_percent = round(((otooley_votes / total_votes) * 100), 2)
-    print(khan_percent)
-    print(correy_percent)
-    print(li_percent)
-    print(otooley_percent)
-    
-    #Winner 
-    if khan_percent > max(correy_percent, li_percent, otooley_percent):
-        winner = "Khan"
-    elif correy_percent > max(khan_percent, li_percent, otooley_percent):
-        winner = "Correy"  
-    elif li_percent > max(correy_percent, khan_percent, otooley_percent):
-        winner = "Li"
-    else:
-        winner = "O'Tooley"
+    # Store data under the csvreader variable
+    csvreader = csv.reader(elections,delimiter=",") 
 
-        #Print Statements
+    # Skip the header so we iterate through the actual values
+    header = next(csvreader)     
 
-print(f"Election Results") + "\n"
-print(f"-----------------------------------") + "\n"
-print(f"Total Votes: {total_votes}" + "\n"
-print(f"-----------------------------------") + "\n"
-print(f"Khan: {khan_percent}% ({khan_votes})") + "\n"
-print(f"Correy: {correy_percent}% ({correy_votes})") + "\n"
-print(f"Li: {li_percent}% ({li_votes})") + "\n"
-print(f"O'Tooley: {otooley_percent}% ({otooley_votes})") + "\n"
-print(f"-----------------------------------") + "\n"
-print(f"Winner: {winner}") + "\n"
-print(f"-----------------------------------")
+    # Iterate through each row in the csv
+    for row in csvreader: 
+
+        # Count the unique Voter ID's and store in variable  called total_votes
+        total_votes +=1
+
+        # We have four candidates if the name is found, count the times it appears and store in a list
+        # We can use this values in our percent vote calculation in the print statements
+        if row[2] == "Khan": 
+            khan_votes +=1
+        elif row[2] == "Correy":
+            correy_votes +=1
+        elif row[2] == "Li": 
+            li_votes +=1
+        elif row[2] == "O'Tooley":
+            otooley_votes +=1
+
+ # To find the winner we want to make a dictionary out of the two lists we previously created 
+candidates = ["Khan", "Correy", "Li","O'Tooley"]
+votes = [khan_votes, correy_votes,li_votes,otooley_votes]
+
+# We zip them together the list of candidate(key) and the total votes(value)
+# Return the winner using a max function of the dictionary 
+dict_candidates_and_votes = dict(zip(candidates,votes))
+key = max(dict_candidates_and_votes, key=dict_candidates_and_votes.get)
+
+# Print a the summary of the analysis
+khan_percent = (khan_votes/total_votes) *100
+correy_percent = (correy_votes/total_votes) * 100
+li_percent = (li_votes/total_votes)* 100
+otooley_percent = (otooley_votes/total_votes) * 100
+
+# Print the summary table
+print(f"Election Results")
+print(f"----------------------------")
+print(f"Total Votes: {total_votes}")
+print(f"----------------------------")
+print(f"Khan: {khan_percent:.3f}% ({khan_votes})")
+print(f"Correy: {correy_percent:.3f}% ({correy_votes})")
+print(f"Li: {li_percent:.3f}% ({li_votes})")
+print(f"O'Tooley: {otooley_percent:.3f}% ({otooley_votes})")
+print(f"----------------------------")
+print(f"Winner: {key}")
+print(f"----------------------------")
+
+# Output files
+# Assign output file location and with the pathlib library
+output_file = Path("python-challenge", "PyPoll", "Election_Results_Summary.txt")
+
+with open(output_file,"w") as file:
+
+# Write methods to print to Elections_Results_Summary 
+    file.write(f"Election Results")
+    file.write("\n")
+    file.write(f"----------------------------")
+    file.write("\n")
+    file.write(f"Total Votes: {total_votes}")
+    file.write("\n")
+    file.write(f"----------------------------")
+    file.write("\n")
+    file.write(f"Khan: {khan_percent:.3f}% ({khan_votes})")
+    file.write("\n")
+    file.write(f"Correy: {correy_percent:.3f}% ({correy_votes})")
+    file.write("\n")
+    file.write(f"Li: {li_percent:.3f}% ({li_votes})")
+    file.write("\n")
+    file.write(f"O'Tooley: {otooley_percent:.3f}% ({otooley_votes})")
+    file.write("\n")
+    file.write(f"----------------------------")
+    file.write("\n")
+    file.write(f"Winner: {key}")
+    file.write("\n")
+    file.write(f"----------------------------")
